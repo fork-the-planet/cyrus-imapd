@@ -11,10 +11,6 @@ Upgrading to 3.13
    snapshot** and is not meant to be trusted as a stable release for production
    deployment.
 
-   The rest of this document is old news: it describes the *general* upgrade
-   procedure, and largely in terms of upgrading from 3.10 to 3.12.  Future
-   versions of this document may describe the upgrade from 3.12 to 3.13.
-
 .. note::
 
   This guide assumes that you are familiar and comfortable with administration
@@ -34,19 +30,28 @@ Things to consider **before** you begin:
 Versions to upgrade from
 ########################
 
-Before upgrading to 3.12, your deployment should be running
-**3.10.1 (or later)**
+Before upgrading to 3.13, your deployment should be running
+**3.12.0 (or later)**
 
 If your existing deployment is older than this, you should first upgrade
-to 3.10.1, let it run for a while, resolve any issues that come up, and only
-then upgrade to 3.12.
+to 3.12.0, let it run for a while, resolve any issues that come up, and only
+then upgrade to 3.13.
 
-Installation from tarball
-#########################
+…but again, the 3.13 series of releases is made up of **developer snapshots**
+and you should not be upgrading systems in production use.
 
-You will need to install from our packaged tarball. We provide a full list of
-libraries that Debian requires, but we aren't able to test all platforms: you
-may find you need to install additional or different libraries to support 3.12.
+Configuration changes
+#####################
+
+.. _upgrade_overlapping_partitions:
+
+Eliminate overlapping partitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``master(8)`` will refuse to start if multiple partitions appear to be
+identical or overlap. (:issue:`5573`:)  If you are configured this way, this is
+already probably unsafe, and you should correct your configuration before
+attempting to upgrade.
 
 JMAP/CalDAV changes
 ###################
@@ -86,49 +91,22 @@ maintained) is called "pcre3".  Yes, this is confusing.
 How are you planning on upgrading?
 ##################################
 
-Ideally, you will do a sandboxed test installation of 3.12 using a snapshot
+Ideally, you will do a sandboxed test installation of 3.13 using a snapshot
 of your existing data before you switch off your existing installation.
 
 Other possibilities are upgrading by replication, or upgrading in place.
 
-**The rest of the instructions are written assuming a sandboxed 3.12
+**The rest of the instructions are written assuming a sandboxed 3.13
 installation**, but you should read and understand them regardless of how
 you intend to perform the upgrade.
 
 Upgrade by replicating
 ~~~~~~~~~~~~~~~~~~~~~~
 
-If you're familiar with replication, and your current installation is 2.4 or
-newer, you can set up your existing installation to replicate data to a new
-3.12 installation and failover to the new installation when you're ready. The
-replication protocol has been kept mostly backwards compatible.
-
-If your old installation contains mailboxes or messages that are older than
-2.4, they may not have GUID fields in their indexes (index version too old),
-or they may have their GUID field set to zero.  3.12 will not accept message
-replications without valid matching GUIDs, so you need to fix this on your
-old installation first.
-
-You can check for affected mailboxes by examining the output from the
-:cyrusman:`mbexamine(8)` tool:
-
-* mailboxes that report a 'Minor Version:' less than 10 will need to have
-  their index upgraded using :cyrusman:`reconstruct(8)` with the
-  `-V <version>` parameter to be at least 10.
-* mailboxes containing messages that report 'GUID:0' will need to have
-  their GUIDs recalculated using :cyrusman:`reconstruct(8)` with the `-G`
-  parameter.
-
-If you have a large amount of data, these reconstructs will take a long time,
-so it's better to identify the mailboxes needing attention and target them
-specifically.  But if you have a small amount of data, it might be less work
-to just `reconstruct -G -V max` everything.
-
-If your old installation is on 3.0 or older and is using mailbox annotations,
-you will have problems replicating to newer versions due to missing MODSEQ
-(:issue:`4967`).  There is an experimental patch in the comments on this issue
-that might help for a one-off replication run into an empty replica, but it
-will not help for updating a replica that already has data.
+If you're familiar with replication, you can set up your existing installation
+to replicate data to a new 3.12 installation and failover to the new
+installation when you're ready. The replication protocol has been kept mostly
+backwards compatible.
 
 Upgrade in place
 ~~~~~~~~~~~~~~~~
@@ -137,6 +115,11 @@ If you are upgrading in place, you will need to shut down Cyrus entirely while
 you install the new package.  You should probably also block logins or filewall
 off internet access until you're completely finished so that you aren't
 surprised by users reconnecting before the upgraded server is ready for them.
+
+.. warning::
+   The rest of this document is old news: it describes the *general* upgrade
+   procedure, and largely in terms of upgrading from 3.10 to 3.12.  Future
+   versions of this document may describe the upgrade from 3.12 to 3.13.
 
 Do What As Who?
 ###############
