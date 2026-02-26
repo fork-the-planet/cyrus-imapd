@@ -71,13 +71,13 @@ Implemented
 * JMAP for Quotas (:rfc:`9425`)
 * JMAP for Sieve Scripts (:rfc:`9661`)
 * A JMAP Subprotocol for WebSocket (:rfc:`8887`)
+* JMAP for Contacts (:rfc:`9610`)
+* JMAP Sharing (:rfc:`9670`)
 
 In development
 --------------
 
 * JMAP for Calendars (:draft:`draft-ietf-jmap-calendars`)
-* JMAP for Contacts (:draft:`draft-ietf-jmap-contacts`)
-* JMAP Sharing (:draft:`draft-ietf-jmap-sharing`)
 * Handling MDN with JMAP (:rfc:`9007`)
 
 Not implemented
